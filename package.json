@@ -1,0 +1,9 @@
+{
+  "name": "reviewbuddy",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter web build",
+    "preview": "pnpm --filter web preview"
+  }
+}

@@ -68,8 +68,7 @@ instance/
 # Scrapy stuff:
 .scrapy
 
-# Sphinx documentation
-docs/_build/
+# Sphinx documentation (not docs/ — that's the GitHub Pages build output)
 
 # PyBuilder
 target/
@@ -127,3 +126,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Node
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store

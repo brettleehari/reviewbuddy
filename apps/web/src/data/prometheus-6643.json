@@ -1,0 +1,103 @@
+{
+  "repo": "prometheus/prometheus",
+  "pr_number": 6643,
+  "title": "PromQL: Don't panic on syntax errors",
+  "author": "slrtbtfs",
+  "url": "https://github.com/prometheus/prometheus/pull/6643",
+  "closed_at": "2020-01-16T15:20:21Z",
+  "files_changed": [
+    {
+      "path": "promql/generated_parser.y",
+      "additions": 31,
+      "deletions": 20,
+      "patch_snippet": "@@ -199,7 +199,7 @@ aggregate_expr  : aggregate_op aggregate_modifier function_call_body\n                 | aggregate_op function_call_body\n                         { $$ = yylex.(*parser).newAggregateExpr($1, &AggregateExpr{}, $2) }\n                 | aggregate_op error\n-                        { yylex.(*parser).unexpected(\"aggregation\",\"\") }\n+                        { yylex.(*parser).unexpected(\"aggregation\",\"\"); $$ = nil }\n                 ;\n \n aggregate_modifier:\n@@ -294,7 +294,7 @@ grouping_labels : LEFT_PAREN grouping_label_list RIGHT_PAREN"
+    },
+    {
+      "path": "promql/generated_parser.y.go",
+      "additions": 220,
+      "deletions": 191,
+      "patch_snippet": "@@ -183,63 +183,63 @@ const yyEofCode = 1\n const yyErrCode = 2\n const yyInitialStackSize = 16\n \n-//line promql/generated_parser.y:695\n+//line promql/generated_parser.y:706\n \n //line yacctab:1\n var yyExca = [...]int{\n \t-1, 1,"
+    },
+    {
+      "path": "promql/parse.go",
+      "additions": 69,
+      "deletions": 21,
+      "patch_snippet": "@@ -48,11 +48,10 @@ type parser struct {\n \tyyParser yyParserImpl\n \n \tgeneratedParserResult interface{}\n+\tparseErrors           ParseErrors\n }\n \n // ParseErr wraps a parsing error with line and position context.\n-// If the parsing input was a single line, line will be 0 and omitted\n-// from the error string."
+    },
+    {
+      "path": "promql/parse_test.go",
+      "additions": 4,
+      "deletions": 0,
+      "patch_snippet": "@@ -1963,6 +1963,10 @@ var testExpr = []struct {\n \t\tinput:  `topk(some_metric)`,\n \t\tfail:   true,\n \t\terrMsg: \"wrong number of arguments for aggregate expression provided, expected 2, got 1\",\n+\t}, {\n+\t\tinput:  `topk(some_metric,)`,\n+\t\tfail:   true,\n+\t\terrMsg: \"trailing commas not allowed in function call args\",\n \t}, {\n \t\tinput:  `topk(some_metric, other_metric)`,"
+    }
+  ],
+  "actual_reviewers": [
+    {
+      "handle": "brian-brazil",
+      "display_name": "brian-brazil",
+      "expertise_score": 25.2,
+      "seniority_score": 79.2,
+      "contributions": [
+        {
+          "file": "promql/parse.go",
+          "lines_authored": 113,
+          "commits": 18,
+          "first_contribution": "2015-08-19T21:09:00+01:00",
+          "last_contribution": "2018-11-12T18:47:13+00:00",
+          "ownership_pct": 4.3
+        },
+        {
+          "file": "promql/parse_test.go",
+          "lines_authored": 385,
+          "commits": 17,
+          "first_contribution": "2015-08-19T21:09:00+01:00",
+          "last_contribution": "2018-11-12T18:47:13+00:00",
+          "ownership_pct": 8.7
+        }
+      ]
+    }
+  ],
+  "best_pick": {
+    "handle": "fabxc",
+    "display_name": "fabxc",
+    "expertise_score": 65.3,
+    "seniority_score": 99.9,
+    "contributions": [
+      {
+        "file": "promql/parse.go",
+        "lines_authored": 1425,
+        "commits": 34,
+        "first_contribution": "2015-03-30T18:12:51+02:00",
+        "last_contribution": "2017-08-11T20:45:52+02:00",
+        "ownership_pct": 54.1
+      },
+      {
+        "file": "promql/parse_test.go",
+        "lines_authored": 2212,
+        "commits": 27,
+        "first_contribution": "2015-03-30T18:12:51+02:00",
+        "last_contribution": "2016-12-28T09:16:48+01:00",
+        "ownership_pct": 50.0
+      }
+    ]
+  },
+  "reasoning": "@brian-brazil is a core Prometheus maintainer with broad coverage. Smart-review's pick, @fabxc, has 54.1% ownership of the affected PromQL parser files going back to March 2015, compared to @brian-brazil's 4.3%. Parser changes that introduce panic paths are a known failure mode; a reviewer with hands-on history in promql/parse.go would more likely have flagged the unhandled syntax-error path.",
+  "cost_of_gap": "Soon after merge, issue #6649 was filed by @juliusv, a Prometheus co-creator: a fuzzed input caused a parser panic, traced verbatim to \"caused by #6643.\" Fixed in #6650. Parser changes that introduce panic paths are a known failure mode; a reviewer with deeper history in promql/parse.go would likely have flagged the unhandled error path.",
+  "cost_of_gap_links": [
+    {"text": "#6649", "url": "https://github.com/prometheus/prometheus/issues/6649"},
+    {"text": "#6650", "url": "https://github.com/prometheus/prometheus/pull/6650"}
+  ],
+  "outcome_contrast": {
+    "actual_lines": [
+      "@brian-brazil commented (combined 104.4)",
+      "Issue #6649 filed by @juliusv (Prometheus co-creator): fuzzed input caused a parser panic, traced to \"caused by #6643\"",
+      "Fixed in #6650"
+    ],
+    "proposed_lines": [
+      "@fabxc (combined 165.2)",
+      "54.1% ownership of parse.go across 34 commits, contributing since Mar 2015",
+      "A reviewer with deeper history in promql/parse.go would likely have flagged the unhandled error path"
+    ]
+  },
+  "computed_at": "2026-04-26T02:43:15.424391+00:00"
+}

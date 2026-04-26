@@ -1,0 +1,131 @@
+{
+  "repo": "huggingface/transformers",
+  "pr_number": 8308,
+  "title": "Clean up data collators and datasets",
+  "author": "sgugger",
+  "url": "https://github.com/huggingface/transformers/pull/8308",
+  "closed_at": "2020-11-04T22:24:49Z",
+  "files_changed": [
+    {
+      "path": "examples/language-modeling/run_mlm.py",
+      "additions": 12,
+      "deletions": 2,
+      "patch_snippet": "@@ -264,7 +264,15 @@ def main():\n         def tokenize_function(examples):\n             # Remove empty lines\n             examples[\"text\"] = [line for line in examples[\"text\"] if len(line) > 0 and not line.isspace()]\n-            return tokenizer(examples[\"text\"], padding=padding, truncation=True, max_length=data_args.max_seq_length)\n+            return tokenizer(\n+                examples[\"text\"],\n+                padding=padding,\n+                truncation=True,\n+                max_length=data_args.max_seq_length,"
+    },
+    {
+      "path": "src/transformers/__init__.py",
+      "additions": 0,
+      "deletions": 1,
+      "patch_snippet": "@@ -281,7 +281,6 @@\n     from .data.data_collator import (\n         DataCollator,\n         DataCollatorForLanguageModeling,\n-        DataCollatorForNextSentencePrediction,\n         DataCollatorForPermutationLanguageModeling,\n         DataCollatorForSOP,\n         DataCollatorForTokenClassification,"
+    },
+    {
+      "path": "src/transformers/data/data_collator.py",
+      "additions": 90,
+      "deletions": 176,
+      "patch_snippet": "@@ -1,4 +1,5 @@\n import random\n+import warnings\n from dataclasses import dataclass\n from typing import Any, Callable, Dict, List, NewType, Optional, Tuple, Union\n \n@@ -175,72 +176,111 @@ def __call__(self, features):\n         return batch\n \n "
+    },
+    {
+      "path": "src/transformers/data/datasets/language_modeling.py",
+      "additions": 23,
+      "deletions": 3,
+      "patch_snippet": "@@ -3,6 +3,7 @@\n import pickle\n import random\n import time\n+import warnings\n from typing import Dict, List, Optional\n \n import torch\n@@ -17,6 +18,11 @@\n logger = logging.get_logger(__name__)"
+    },
+    {
+      "path": "src/transformers/utils/dummy_pt_objects.py",
+      "additions": 0,
+      "deletions": 5,
+      "patch_snippet": "@@ -26,11 +26,6 @@ def from_pretrained(self, *args, **kwargs):\n         requires_pytorch(self)\n \n \n-class DataCollatorForNextSentencePrediction:\n-    def __init__(self, *args, **kwargs):\n-        requires_pytorch(self)\n-\n-\n class DataCollatorForPermutationLanguageModeling:"
+    },
+    {
+      "path": "tests/test_data_collator.py",
+      "additions": 10,
+      "deletions": 9,
+      "patch_snippet": "@@ -12,9 +12,7 @@\n \n     from transformers import (\n         DataCollatorForLanguageModeling,\n-        DataCollatorForNextSentencePrediction,\n         DataCollatorForPermutationLanguageModeling,\n-        DataCollatorForSOP,\n         DataCollatorForTokenClassification,\n         DataCollatorWithPadding,\n         default_data_collator,"
+    }
+  ],
+  "actual_reviewers": [
+    {
+      "handle": "LysandreJik",
+      "display_name": "LysandreJik",
+      "expertise_score": 26.8,
+      "seniority_score": 24.7,
+      "contributions": [
+        {
+          "file": "src/transformers/__init__.py",
+          "lines_authored": 62,
+          "commits": 47,
+          "first_contribution": "2019-08-07T12:53:19-04:00",
+          "last_contribution": "2020-10-20T16:21:11+02:00",
+          "ownership_pct": 2.6
+        },
+        {
+          "file": "src/transformers/data/datasets/language_modeling.py",
+          "lines_authored": 11,
+          "commits": 1,
+          "first_contribution": "2020-08-26T17:20:22+02:00",
+          "last_contribution": "2020-08-26T17:20:22+02:00",
+          "ownership_pct": 2.1
+        },
+        {
+          "file": "src/transformers/utils/dummy_pt_objects.py",
+          "lines_authored": 9,
+          "commits": 1,
+          "first_contribution": "2020-10-06T23:44:03+02:00",
+          "last_contribution": "2020-10-06T23:44:03+02:00",
+          "ownership_pct": 0.4
+        },
+        {
+          "file": "src/transformers/__init__.py",
+          "lines_authored": 27,
+          "commits": 5,
+          "first_contribution": "2020-03-19T13:53:05-04:00",
+          "last_contribution": "2020-10-06T23:31:21+02:00",
+          "ownership_pct": 1.2
+        },
+        {
+          "file": "src/transformers/data/datasets/language_modeling.py",
+          "lines_authored": 2,
+          "commits": 1,
+          "first_contribution": "2020-08-26T11:10:36-04:00",
+          "last_contribution": "2020-08-26T11:10:36-04:00",
+          "ownership_pct": 0.4
+        }
+      ]
+    }
+  ],
+  "best_pick": {
+    "handle": "thomwolf",
+    "display_name": "thomwolf",
+    "expertise_score": 62.2,
+    "seniority_score": 72.1,
+    "contributions": [
+      {
+        "file": "src/transformers/__init__.py",
+        "lines_authored": 618,
+        "commits": 102,
+        "first_contribution": "2018-11-15T20:56:10+01:00",
+        "last_contribution": "2020-01-24T17:49:02-05:00",
+        "ownership_pct": 26.4
+      }
+    ]
+  },
+  "reasoning": "@LysandreJik is a core HF maintainer, but adding the same senior maintainers to every change is exactly the pattern that leads to review fatigue. For the transformers module specifically, @thomwolf has 26.4% ownership across 102 commits going back to November 2018, compared to @LysandreJik's 1.2% across 5 commits starting March 2020. @thomwolf is the right person for this specific change, not just a default approver. The PR removed a clone().detach() call on a tensor that was then mutated in-place via label assignment. A reviewer with deeper history on the data-collator path would more likely have caught the in-place mutation interaction.",
+  "cost_of_gap": "Fourteen days after merge, issue #8619 was filed: \"DataCollatorForLanguageModeling modifies input_ids via labels variable.\" The bug was traced to a removed clone().detach() call. From the original PR review thread, the cloning step was discussed and removed as feeling \"more like a reflex than something really useful.\" A reviewer with hands-on history on this exact file would likely have spotted the in-place mutation risk before merge. Fixed in #8621.",
+  "cost_of_gap_links": [
+    {"text": "#8619", "url": "https://github.com/huggingface/transformers/issues/8619"},
+    {"text": "#8621", "url": "https://github.com/huggingface/transformers/pull/8621"}
+  ],
+  "outcome_contrast": {
+    "actual_lines": [
+      "@LysandreJik approved (combined 51.5)",
+      "14 days post-merge, issue #8619 filed: \"DataCollatorForLanguageModeling modifies input_ids via labels variable\"",
+      "Fixed in #8621"
+    ],
+    "proposed_lines": [
+      "@thomwolf (combined 134.3)",
+      "26.4% ownership of __init__.py across 102 commits, contributing since Nov 2018",
+      "A reviewer with hands-on history on data_collator.py would likely have spotted the in-place mutation risk"
+    ]
+  },
+  "computed_at": "2026-04-26T02:53:27.187422+00:00"
+}

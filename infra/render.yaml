@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: smartreview-api
+    runtime: docker
+    dockerfilePath: apps/api/Dockerfile
+    dockerContext: .
+    plan: starter
+    envVars:
+      - key: SMARTREVIEW_GITHUB_CLIENT_ID
+        sync: false
+      - key: SMARTREVIEW_GITHUB_CLIENT_SECRET
+        sync: false
+      - key: SMARTREVIEW_ALLOWED_ORIGINS
+        value: https://brettleehari.github.io
+    healthCheckPath: /health

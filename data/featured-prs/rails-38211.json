@@ -1,0 +1,90 @@
+{
+  "repo": "rails/rails",
+  "pr_number": 38211,
+  "title": "Do not re-parse PATH_INFO when validating authenticity token",
+  "author": "tenderlove",
+  "url": "https://github.com/rails/rails/pull/38211",
+  "closed_at": "2020-01-10T20:38:02Z",
+  "files_changed": [
+    {
+      "path": "actionpack/lib/action_controller/metal/request_forgery_protection.rb",
+      "additions": 1,
+      "deletions": 1,
+      "patch_snippet": "@@ -381,7 +381,7 @@ def valid_per_form_csrf_token?(token, session) # :doc:\n         if per_form_csrf_tokens\n           correct_token = per_form_csrf_token(\n             session,\n-            normalize_action_path(request.fullpath),\n+            request.fullpath.chomp(\"/\"),\n             request.request_method\n           )\n "
+    },
+    {
+      "path": "actionpack/test/controller/request_forgery_protection_test.rb",
+      "additions": 16,
+      "deletions": 2,
+      "patch_snippet": "@@ -835,6 +835,20 @@ def test_accepts_token_for_correct_path_and_method\n     assert_response :success\n   end\n \n+  def test_rejects_garbage_path\n+    get :index\n+\n+    form_token = assert_presence_and_fetch_form_csrf_token\n+\n+    assert_matches_session_token_on_server form_token"
+    }
+  ],
+  "actual_reviewers": [
+    {
+      "handle": "rafaelfranca",
+      "display_name": "rafaelfranca",
+      "expertise_score": 17.0,
+      "seniority_score": 73.5,
+      "contributions": [
+        {
+          "file": "actionpack/lib/action_controller/metal/request_forgery_protection.rb",
+          "lines_authored": 7,
+          "commits": 3,
+          "first_contribution": "2015-02-18T19:37:56-02:00",
+          "last_contribution": "2018-02-16T19:28:30-05:00",
+          "ownership_pct": 0.6
+        },
+        {
+          "file": "actionpack/test/controller/request_forgery_protection_test.rb",
+          "lines_authored": 60,
+          "commits": 6,
+          "first_contribution": "2014-04-17T16:14:40-03:00",
+          "last_contribution": "2016-08-16T04:30:11-03:00",
+          "ownership_pct": 3.1
+        }
+      ]
+    }
+  ],
+  "best_pick": {
+    "handle": "jeremy",
+    "display_name": "jeremy",
+    "expertise_score": 33.1,
+    "seniority_score": 88.1,
+    "contributions": [
+      {
+        "file": "actionpack/lib/action_controller/metal/request_forgery_protection.rb",
+        "lines_authored": 84,
+        "commits": 5,
+        "first_contribution": "2007-12-10T01:15:30+00:00",
+        "last_contribution": "2013-12-17T16:02:04-07:00",
+        "ownership_pct": 7.8
+      },
+      {
+        "file": "actionpack/test/controller/request_forgery_protection_test.rb",
+        "lines_authored": 137,
+        "commits": 13,
+        "first_contribution": "2007-10-02T05:32:14+00:00",
+        "last_contribution": "2013-12-17T16:02:04-07:00",
+        "ownership_pct": 7.0
+      }
+    ]
+  },
+  "reasoning": "@jeremy authored 7.8% of request_forgery_protection.rb across 5 commits, with first contribution in December 2007. @rafaelfranca's footprint on the same file is 0.6% across 3 commits. @jeremy's last contribution was in 2013; Smart-review still surfaces him because ownership and tenure remain dominant. In practice, a senior consult on a CSRF change would have flagged the path-vs-fullpath interaction.",
+  "cost_of_gap": "This PR shipped on Jan 10, 2020. Twelve days later a regression was reported on the same PR thread: POST requests with query parameters started failing CSRF validation. The fix landed in #38295, which swapped fullpath for path. A reviewer with deeper history on request_forgery_protection.rb would more likely have flagged the query-string interaction during review.",
+  "cost_of_gap_links": [
+    {"text": "#38295", "url": "https://github.com/rails/rails/pull/38295"}
+  ],
+  "outcome_contrast": {
+    "actual_lines": [
+      "@rafaelfranca approved (combined 90.5)",
+      "12 days later, regression filed on this PR thread: POSTs with query params failed CSRF validation",
+      "Fixed in #38295 by swapping fullpath for path"
+    ],
+    "proposed_lines": [
+      "@jeremy (combined 121.2)",
+      "7.8% ownership of request_forgery_protection.rb across 5 commits, contributing since Dec 2007",
+      "A senior consult on this CSRF change would likely have flagged the path-vs-fullpath interaction"
+    ]
+  },
+  "computed_at": "2026-04-26T02:49:59.448351+00:00"
+}

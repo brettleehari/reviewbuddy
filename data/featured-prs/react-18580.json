@@ -1,0 +1,66 @@
+{
+  "repo": "facebook/react",
+  "pr_number": 18580,
+  "title": "Feature: Add support to `exhaustive-deps` rule for any hook ending with `Effect`",
+  "author": "airjp73",
+  "url": "https://github.com/facebook/react/pull/18580",
+  "closed_at": "2020-05-01T15:57:25Z",
+  "files_changed": [
+    {
+      "path": "packages/eslint-plugin-react-hooks/__tests__/ESLintRuleExhaustiveDeps-test.js",
+      "additions": 153,
+      "deletions": 7,
+      "patch_snippet": "@@ -360,32 +360,50 @@ const tests = {\n     {\n       code: normalizeIndent`\n         function MyComponent(props) {\n-          useCustomEffect(() => {\n+          useCustomHook(() => {\n             console.log(props.foo);\n           });\n         }\n       `,"
+    },
+    {
+      "path": "packages/eslint-plugin-react-hooks/src/ExhaustiveDeps.js",
+      "additions": 3,
+      "deletions": 1,
+      "patch_snippet": "@@ -1504,7 +1504,9 @@ function getReactiveHookCallbackIndex(calleeNode, options) {\n       // useImperativeHandle(ref, fn)\n       return 1;\n     default:\n-      if (node === calleeNode && options && options.additionalHooks) {\n+      if (node === calleeNode && node.name.match(/use.+Effect/)) {\n+        return 0;\n+      } else if (node === calleeNode && options && options.additionalHooks) {\n         // Allow the user to provide a regular expression which enables the lint to\n         // target custom reactive hooks."
+    }
+  ],
+  "actual_reviewers": [],
+  "best_pick": {
+    "handle": "gaearon",
+    "display_name": "gaearon",
+    "expertise_score": 83.3,
+    "seniority_score": 62.9,
+    "contributions": [
+      {
+        "file": "packages/eslint-plugin-react-hooks/__tests__/ESLintRuleExhaustiveDeps-test.js",
+        "lines_authored": 5591,
+        "commits": 23,
+        "first_contribution": "2019-02-20T18:18:58+00:00",
+        "last_contribution": "2020-04-01T20:54:42+01:00",
+        "ownership_pct": 60.1
+      },
+      {
+        "file": "packages/eslint-plugin-react-hooks/src/ExhaustiveDeps.js",
+        "lines_authored": 1992,
+        "commits": 25,
+        "first_contribution": "2019-02-20T18:18:58+00:00",
+        "last_contribution": "2020-04-01T20:54:42+01:00",
+        "ownership_pct": 92.4
+      }
+    ]
+  },
+  "reasoning": "No formal reviewer was assigned to this PR. @gaearon authored 92.4% of ExhaustiveDeps.js across 25 commits, with active contributions through April 2020. Smart-review would have flagged the missing review and surfaced him as the natural reviewer for any change to the exhaustive-deps rule.",
+  "cost_of_gap": "This PR was reverted 25 days after merge in #19004. From the revert: \"there's both bugs in the implementation (#19001) and too many false positives. I think it's clear this heuristic hasn't worked out.\" With no formal reviewer assigned, the heuristic shipped without scrutiny from the engineer who owned 92% of the file.",
+  "cost_of_gap_links": [
+    {"text": "#19004", "url": "https://github.com/facebook/react/pull/19004"},
+    {"text": "#19001", "url": "https://github.com/facebook/react/issues/19001"}
+  ],
+  "outcome_contrast": {
+    "actual_lines": [
+      "No formal reviewer assigned",
+      "Reverted 25 days later in #19004",
+      "From the revert: \"too many false positives. I think it's clear this heuristic hasn't worked out.\""
+    ],
+    "proposed_lines": [
+      "@gaearon (combined 146.2)",
+      "92.4% ownership of ExhaustiveDeps.js across 25 commits",
+      "Smart-review would have flagged the missing review and surfaced him as the natural reviewer"
+    ]
+  },
+  "computed_at": "2026-04-26T02:47:24.542969+00:00"
+}

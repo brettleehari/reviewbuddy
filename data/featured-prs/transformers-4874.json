@@ -1,0 +1,196 @@
+{
+  "repo": "huggingface/transformers",
+  "pr_number": 4874,
+  "title": "Split LMBert model in two",
+  "author": "sgugger",
+  "url": "https://github.com/huggingface/transformers/pull/4874",
+  "closed_at": "2020-06-10T22:26:43Z",
+  "files_changed": [
+    {
+      "path": "src/transformers/modeling_bert.py",
+      "additions": 119,
+      "deletions": 39,
+      "patch_snippet": "@@ -873,11 +873,13 @@ def forward(\n         return outputs  # (loss), prediction_scores, seq_relationship_score, (hidden_states), (attentions)\n \n \n-# TODO: Split with a different BertWithLMHead to get rid of `lm_labels` here and in encoder_decoder.\n-@add_start_docstrings(\"\"\"Bert Model with a `language modeling` head on top. \"\"\", BERT_START_DOCSTRING)\n-class BertForMaskedLM(BertPreTrainedModel):\n+@add_start_docstrings(\n+    \"\"\"Bert Model with a `language modeling` head on top for CLM fine-tuning. \"\"\", BERT_START_DOCSTRING\n+)"
+    },
+    {
+      "path": "src/transformers/modeling_encoder_decoder.py",
+      "additions": 0,
+      "deletions": 7,
+      "patch_snippet": "@@ -192,7 +192,6 @@ def forward(\n         decoder_head_mask=None,\n         decoder_inputs_embeds=None,\n         labels=None,\n-        lm_labels=None,\n         **kwargs,\n     ):\n \n@@ -239,11 +238,6 @@ def forward(\n                 Indices should be in ``[-100, 0, ..., config.vocab_size]`` (see ``input_ids`` docstring)"
+    },
+    {
+      "path": "tests/test_modeling_bert.py",
+      "additions": 36,
+      "deletions": 5,
+      "patch_snippet": "@@ -35,7 +35,7 @@\n         BertForTokenClassification,\n         BertForMultipleChoice,\n     )\n-    from transformers.modeling_bert import BERT_PRETRAINED_MODEL_ARCHIVE_LIST\n+    from transformers.modeling_bert import BERT_PRETRAINED_MODEL_ARCHIVE_LIST, BertLMHeadModel\n \n \n class BertModelTester:\n@@ -211,6 +211,33 @@ def create_and_check_bert_model_as_decoder("
+    },
+    {
+      "path": "tests/test_modeling_encoder_decoder.py",
+      "additions": 8,
+      "deletions": 44,
+      "patch_snippet": "@@ -27,7 +27,8 @@\n \n \n if is_torch_available():\n-    from transformers import BertModel, BertForMaskedLM, EncoderDecoderModel, EncoderDecoderConfig\n+    from transformers import BertModel, EncoderDecoderModel, EncoderDecoderConfig\n+    from transformers.modeling_bert import BertLMHeadModel\n     import numpy as np\n     import torch\n "
+    }
+  ],
+  "actual_reviewers": [
+    {
+      "handle": "thomwolf",
+      "display_name": "thomwolf",
+      "expertise_score": 62.5,
+      "seniority_score": 54.5,
+      "contributions": [
+        {
+          "file": "src/transformers/modeling_bert.py",
+          "lines_authored": 768,
+          "commits": 33,
+          "first_contribution": "2019-07-03T22:54:39+02:00",
+          "last_contribution": "2019-12-05T14:36:34+01:00",
+          "ownership_pct": 25.7
+        },
+        {
+          "file": "src/transformers/modeling_encoder_decoder.py",
+          "lines_authored": 1,
+          "commits": 2,
+          "first_contribution": "2019-11-05T16:40:29+01:00",
+          "last_contribution": "2019-12-18T10:43:48+01:00",
+          "ownership_pct": 0.2
+        }
+      ]
+    },
+    {
+      "handle": "LysandreJik",
+      "display_name": "LysandreJik",
+      "expertise_score": 51.0,
+      "seniority_score": 47.4,
+      "contributions": [
+        {
+          "file": "src/transformers/modeling_bert.py",
+          "lines_authored": 559,
+          "commits": 24,
+          "first_contribution": "2019-07-09T15:55:31-04:00",
+          "last_contribution": "2020-02-04T16:31:07-05:00",
+          "ownership_pct": 18.7
+        },
+        {
+          "file": "src/transformers/modeling_encoder_decoder.py",
+          "lines_authored": 2,
+          "commits": 2,
+          "first_contribution": "2020-01-08T13:52:46+01:00",
+          "last_contribution": "2020-01-22T19:24:02-05:00",
+          "ownership_pct": 0.4
+        }
+      ]
+    },
+    {
+      "handle": "patrickvonplaten",
+      "display_name": "patrickvonplaten",
+      "expertise_score": 48.1,
+      "seniority_score": 24.6,
+      "contributions": [
+        {
+          "file": "src/transformers/modeling_bert.py",
+          "lines_authored": 45,
+          "commits": 4,
+          "first_contribution": "2020-04-16T15:58:57+02:00",
+          "last_contribution": "2020-06-10T18:10:59+02:00",
+          "ownership_pct": 1.5
+        },
+        {
+          "file": "src/transformers/modeling_encoder_decoder.py",
+          "lines_authored": 239,
+          "commits": 3,
+          "first_contribution": "2020-04-28T15:11:09+02:00",
+          "last_contribution": "2020-05-30T01:25:19+02:00",
+          "ownership_pct": 46.2
+        },
+        {
+          "file": "tests/test_modeling_bert.py",
+          "lines_authored": 360,
+          "commits": 1,
+          "first_contribution": "2020-05-04T02:18:36+02:00",
+          "last_contribution": "2020-05-04T02:18:36+02:00",
+          "ownership_pct": 81.8
+        },
+        {
+          "file": "tests/test_modeling_encoder_decoder.py",
+          "lines_authored": 404,
+          "commits": 5,
+          "first_contribution": "2020-04-28T15:11:09+02:00",
+          "last_contribution": "2020-06-05T23:16:37+02:00",
+          "ownership_pct": 96.7
+        }
+      ]
+    },
+    {
+      "handle": "sshleifer",
+      "display_name": "sshleifer",
+      "expertise_score": 22.6,
+      "seniority_score": 19.4,
+      "contributions": [
+        {
+          "file": "src/transformers/modeling_bert.py",
+          "lines_authored": 10,
+          "commits": 3,
+          "first_contribution": "2020-02-13T08:28:33-05:00",
+          "last_contribution": "2020-06-08T17:08:04-04:00",
+          "ownership_pct": 0.3
+        },
+        {
+          "file": "src/transformers/modeling_encoder_decoder.py",
+          "lines_authored": 1,
+          "commits": 4,
+          "first_contribution": "2020-02-20T18:11:13-05:00",
+          "last_contribution": "2020-05-25T19:20:50-04:00",
+          "ownership_pct": 0.2
+        },
+        {
+          "file": "tests/test_modeling_encoder_decoder.py",
+          "lines_authored": 0,
+          "commits": 1,
+          "first_contribution": "2020-02-26T11:36:27-05:00",
+          "last_contribution": "2020-02-26T11:36:27-05:00",
+          "ownership_pct": 0.0
+        }
+      ]
+    }
+  ],
+  "best_pick": {
+    "handle": "thomwolf",
+    "display_name": "thomwolf",
+    "expertise_score": 62.5,
+    "seniority_score": 54.5,
+    "contributions": [
+      {
+        "file": "src/transformers/modeling_bert.py",
+        "lines_authored": 768,
+        "commits": 33,
+        "first_contribution": "2019-07-03T22:54:39+02:00",
+        "last_contribution": "2019-12-05T14:36:34+01:00",
+        "ownership_pct": 25.7
+      },
+      {
+        "file": "src/transformers/modeling_encoder_decoder.py",
+        "lines_authored": 1,
+        "commits": 2,
+        "first_contribution": "2019-11-05T16:40:29+01:00",
+        "last_contribution": "2019-12-18T10:43:48+01:00",
+        "ownership_pct": 0.2
+      }
+    ]
+  },
+  "reviewer_match": true,
+  "reasoning": "Smart-review confirms: the team got this one right. @thomwolf is the top scorer on the affected files (combined 117.0), and he was one of the actual reviewers. The next-best candidate outside the review set (@rlouf, combined 89.8) scores 27 points lower. Sometimes intuition picks the right reviewer. This is one of those times.",
+  "cost_of_gap": "",
+  "outcome_contrast": {
+    "actual_lines": [
+      "@thomwolf approved (combined 117.0), @LysandreJik approved (98.4), @patrickvonplaten approved (72.7)",
+      "The PR merged cleanly. No revert, no follow-up fix, no regression filed.",
+      "The right people reviewed it."
+    ],
+    "proposed_lines": [
+      "Smart-review's top pick: @thomwolf (combined 117.0)",
+      "62.5% expertise, 54.5% seniority on modeling_bert.py, the primary file in this change",
+      "Intuition and analysis agree. The best available reviewer was already on it."
+    ]
+  },
+  "computed_at": "2026-04-26T08:03:45.987183+00:00"
+}

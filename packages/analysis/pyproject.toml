@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "smartreview-analysis"
+version = "0.1.0"
+description = "PyDriller-based code review analysis for Smart-review"
+requires-python = ">=3.10"
+dependencies = [
+    "pydriller>=2.6",
+    "gitpython>=3.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.setuptools.packages.find]
+where = ["."]
